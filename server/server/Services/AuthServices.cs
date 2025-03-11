@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using server.Context;
 using server.Entities;
@@ -27,6 +28,25 @@ namespace server.Services
 
 
             return user;
+        }
+
+
+        public async Task<string?> LoginAsync(UserDto request)
+        {
+            var user = await context.User.FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (user == null)
+            {
+                return null;
+            }
+            
+            if(new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed)
+            {
+                return null;
+            }
+
+            var token = "Some token";
+
+            return token;
         }
 
     }
