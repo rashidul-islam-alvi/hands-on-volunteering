@@ -25,5 +25,17 @@ namespace server.Controllers
 
             return Ok(user);
         }
+
+
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> Login(UserDto request)
+        {
+            var token = await authServices.LoginAsync(request);
+            if (token is null)
+            {
+                return BadRequest("Invalid username or password");
+            }
+            return Ok(token);
+        }
     }
 }
