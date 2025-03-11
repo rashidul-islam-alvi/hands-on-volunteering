@@ -30,12 +30,12 @@ namespace server.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(UserDto request)
         {
-            var token = await authServices.LoginAsync(request);
-            if (token is null)
+            var result = await authServices.LoginAsync(request);
+            if (result is null)
             {
                 return BadRequest("Invalid username or password");
             }
-            return Ok(token);
+            return Ok(result);
         }
     }
 }
