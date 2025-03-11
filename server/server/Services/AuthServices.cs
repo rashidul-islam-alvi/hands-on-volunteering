@@ -61,6 +61,33 @@ namespace server.Services
             return response;
         }
 
+
+        public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request)
+        {
+            var user = await ValidateRefreshTokenAsync(request.UserId, request.RefreshToken);
+            if (user is null)
+            {
+                return null;
+            }
+            var response = new TokenResponseDto
+            {
+                AccessToken = CreateToken(user),
+                RefreshToken = await GenerateAndSaveRefreshTokenAsync(user)
+            };
+            return response;
+        }
+
+
+        private async Task<User?> ValidateRefreshTokenAsync(Guid userId, string refreshToken)
+        {
+            var user = await context.User.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            if (user is null || user.RefreshTokenExpiry < DateTime.UtcNow)
+            {
+                return null;
+            }
+            return user;
+        }
+
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
