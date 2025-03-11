@@ -37,7 +37,7 @@ namespace server.Services
         }
 
 
-        public async Task<string?> LoginAsync(UserDto request)
+        public async Task<TokenResponseDto?> LoginAsync(UserDto request)
         {
             var user = await context.User.FirstOrDefaultAsync(u => u.Username == request.Username);
             if (user == null)
@@ -52,7 +52,13 @@ namespace server.Services
 
             
 
-            return CreateToken(user);
+            var response = new TokenResponseDto
+            {
+                AccessToken = CreateToken(user),
+                RefreshToken = await GenerateAndSaveRefreshTokenAsync(user)
+            };
+
+            return response;
         }
 
         private string GenerateRefreshToken()
